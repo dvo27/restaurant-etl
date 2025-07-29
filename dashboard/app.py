@@ -15,6 +15,14 @@ def get_db_connection():
     db_path = base_dir / "restaurant-etl.db"
     return sqlite3.connect(db_path)
 
+# --- Compute dynamic max reviews for slider ---
+conn = get_db_connection()
+max_reviews = pd.read_sql_query(
+    "SELECT COALESCE(MAX(user_ratings_total), 0) AS max_cnt FROM places",
+    conn
+).iloc[0, 0]
+conn.close()
+
 # --- Sidebar Filters ---
 st.sidebar.header("🔍 Filter Options")
 location_input = st.sidebar.text_input("Location (lat,lng)", "37.7749,-122.4194")
@@ -24,12 +32,18 @@ cuisine_options = st.sidebar.multiselect(
     default=[]
 )
 rating_threshold = st.sidebar.slider("Minimum Rating", 0.0, 5.0, 4.0, 0.1)
-reviews_range = st.sidebar.slider("Review Count Range", 0, 500, (50, 200), 10)
+reviews_range = st.sidebar.slider(
+    "Review Count Range",
+    min_value=0,
+    max_value=int(max_reviews),
+    value=(0, int(max_reviews)),
+    step=1
+)
 underrated_only = st.sidebar.checkbox("Show Underrated Only", value=False)
 
 # --- Build Query ---
 base_query = (
-    "SELECT place_id, name, rating, user_ratings_total, types"
+    "SELECT name, rating, user_ratings_total, types"
     " FROM places"
     " WHERE rating >= ?"
     " AND user_ratings_total BETWEEN ? AND ?"
