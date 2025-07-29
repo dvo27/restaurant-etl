@@ -1,4 +1,3 @@
-```python
 # dashboard/app.py
 
 import streamlit as st
@@ -66,4 +65,3 @@ if not df.empty:
 # --- Display ---
 st.subheader("Filtered Restaurant Picks")
 st.dataframe(df, use_container_width=True)
-```
