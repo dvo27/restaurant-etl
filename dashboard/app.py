@@ -12,7 +12,7 @@ st.title("🍽️ Restaurant ETL – Date Night Picks")
 # Resolve DB path relative to project root
 def get_db_connection():
     base_dir = Path(__file__).parent.parent  # two levels up: restaurant-etl/
-    db_path = base_dir / "restaurant_etl.db"
+    db_path = base_dir / "restaurant-etl.db"
     return sqlite3.connect(db_path)
 
 # --- Sidebar Filters ---
